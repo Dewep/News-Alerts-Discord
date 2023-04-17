@@ -29,7 +29,7 @@ func main() {
 }
 
 func afp(discordChannelId string, discordBotAuthorization string) {
-	lastId := "bTptIyBUd45AB5RI"
+	lastId := ""
 
 	for {
 		messages, newLastId, err := getAfpTweets(lastId)
@@ -164,7 +164,7 @@ func getAfpTweets(lastId string) (messages []string, newLastId string, err error
 		}
 		lastId = id
 
-		prefixRegex := regexp.MustCompile(`^.*\[A LA UNE A \w+\]\n`)
+		prefixRegex := regexp.MustCompile(`^.*\[[A|À] LA UNE [A|À] \w+\]\n?\s?\s?`)
 		if prefixRegex.MatchString(title) {
 			// Remove prefix
 			title = prefixRegex.ReplaceAllString(title, "")
@@ -173,7 +173,7 @@ func getAfpTweets(lastId string) (messages []string, newLastId string, err error
 			suffixRegex := regexp.MustCompile(`(\s#AFP)?(\s\d+\/\d+)?(\shttps:\/\/.+)?\s?$`)
 			title = suffixRegex.ReplaceAllString(title, "")
 
-			message := "> " + strings.ReplaceAll(title, "\n", " ") + "\n> <" + item["url"].(string) + ">"
+			message := "> " + strings.ReplaceAll(title, "\n", " ")
 			messages = append(messages, message)
 		}
 	}

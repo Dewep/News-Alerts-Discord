@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  news-alerts-discord:
+    image: golang:1.18
+    restart: always
+    volumes:
+      - .:/app
+    working_dir: /app
+    environment:
+      - ODISCORD_CHANNEL_ID=123456789
+      - ODISCORD_BOT_AUTHORIZATION=xxx.yyy.zzz
+    command: go run main.go

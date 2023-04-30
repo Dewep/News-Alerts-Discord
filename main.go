@@ -164,7 +164,7 @@ func getAfpTweets(lastId string) (messages []string, newLastId string, err error
 		}
 		lastId = id
 
-		prefixRegex := regexp.MustCompile(`^.*\[[A|À] LA UNE [A|À] \w+\]\n?\s?\s?`)
+		prefixRegex := regexp.MustCompile(`^.*\[[A|À]?\s?LA UNE [A|À]?\s?\w+\]\n?\s?\s?`)
 		if prefixRegex.MatchString(title) {
 			// Remove prefix
 			title = prefixRegex.ReplaceAllString(title, "")
@@ -227,7 +227,7 @@ func getMessages(liveId string, ignoreMessagesIds []string) ([]string, []string,
 }
 
 func getLiveId() (liveId string, err error) {
-	liveIdRegex, _ := regexp.Compile("live_id\":\"([^\"]+)\"")
+	liveIdRegex, _ := regexp.Compile("/live/iframe/([^\"]+)\"")
 
 	resp, err := http.Get("https://www.francetvinfo.fr/en-direct/")
 	if err != nil {

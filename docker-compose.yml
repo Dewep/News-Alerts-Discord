@@ -8,6 +8,6 @@ services:
       - .:/app
     working_dir: /app
     environment:
-      - ODISCORD_CHANNEL_ID=123456789
-      - ODISCORD_BOT_AUTHORIZATION=xxx.yyy.zzz
+      - DISCORD_CHANNEL_ID=123456789
+      - DISCORD_BOT_AUTHORIZATION=xxx.yyy.zzz
     command: go run main.go

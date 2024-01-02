@@ -26,3 +26,11 @@ Then: `systemctl daemon-reload && systemctl start francetvinfo-alerts-discord &&
 For updates: `systemctl restart francetvinfo-alerts-discord`
 
 For logs: `journalctl -u francetvinfo-alerts-discord -f`
+
+## Usage (zx alternative)
+
+```bash
+DISCORD_CHANNEL_ID=123456789 DISCORD_BOT_AUTHORIZATION=xxx.yyy.zzz zx main.mjs
+```
+
+For the first run, exec `zx --install main.mjs` to install dependencies.

@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   news-alerts-discord:
-    image: golang:1.18
+    image: node:lts
     restart: always
     volumes:
       - .:/app
@@ -10,4 +10,4 @@ services:
     environment:
       - DISCORD_CHANNEL_ID=123456789
       - DISCORD_BOT_AUTHORIZATION=xxx.yyy.zzz
-    command: go run main.go
+    command: bash docker-command.sh

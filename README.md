@@ -11,26 +11,18 @@ Send FranceTV live direct alerts to a Discord channel
 
 ## Usage
 
-```bash
-DISCORD_CHANNEL_ID=123456789 DISCORD_BOT_AUTHORIZATION=xxx.yyy.zzz go run main.go
-```
-
-## Service
-
-Create `/lib/systemd/system/francetvinfo-alerts-discord.service`, from the `francetvinfo-alerts-discord.service` file.
-
-Update the WorkingDirectory, and Environment variables.
-
-Then: `systemctl daemon-reload && systemctl start francetvinfo-alerts-discord && systemctl enable francetvinfo-alerts-discord`
-
-For updates: `systemctl restart francetvinfo-alerts-discord`
-
-For logs: `journalctl -u francetvinfo-alerts-discord -f`
-
-## Usage (zx alternative)
+For the first run, exec `zx --install main.mjs` to install dependencies.
 
 ```bash
 DISCORD_CHANNEL_ID=123456789 DISCORD_BOT_AUTHORIZATION=xxx.yyy.zzz zx main.mjs
 ```
 
-For the first run, exec `zx --install main.mjs` to install dependencies.
+## Docker
+
+```
+git pull
+docker compose stop
+docker compose rm
+docker compose build
+docker compose up -d
+```

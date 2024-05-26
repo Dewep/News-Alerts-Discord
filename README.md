@@ -1,6 +1,10 @@
-# FranceTVInfo-Alerts-Discord
+# News-Alerts-Discord
 
-Send FranceTV live direct alerts to a Discord channel
+Send news live direct alerts to a Discord channel
+
+- LeMonde https://www.lemonde.fr/actualite-en-continu/
+- BFM TV https://www.bfmtv.com/
+- FranceTV Info https://www.francetvinfo.fr/en-direct/
 
 ## Discord BOT
 

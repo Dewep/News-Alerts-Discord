@@ -6,6 +6,8 @@ Send news live direct alerts to a Discord channel
 - BFM TV https://www.bfmtv.com/
 - FranceTV Info https://www.francetvinfo.fr/en-direct/
 
+![Discord Screenshot](./images/News-Alerts-Discord-screenshot.png)
+
 ## Discord BOT
 
 - Create a Discord Application: https://discord.com/developers/applications

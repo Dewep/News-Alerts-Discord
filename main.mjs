@@ -93,12 +93,12 @@ async function fetchBFMTV () {
 async function checkNewNews() {
   const articles = []
 
-  try {
+  /*try {
     const franceInfo = await fetchFranceInfo()
     articles.push(...franceInfo)
   } catch (err) {
     console.warn('[FranceInfo.error]', err)
-  }
+  }*/
 
   try {
     const leMonde = await fetchLeMonde()

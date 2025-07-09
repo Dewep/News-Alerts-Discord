@@ -90,6 +90,43 @@ async function fetchBFMTV () {
   return articles
 }
 
+async function fetchNouvelObs () {
+  const articles = []
+
+  const response = await fetch('https://www.nouvelobs.com/depeche/atom.xml')
+  const content = await response.text()
+
+  const dom = new JSDOM(content, { contentType: 'text/xml' })
+  const items = dom.window.document.querySelectorAll('feed > entry')
+
+  let counter = 0
+  for (const item of items) {
+    // Do not try to load oldest articles
+    if (counter++ > 10) {
+      break
+    }
+
+    const hasAuthor = !!item.querySelector('author')
+    if (hasAuthor) {
+      continue
+    }
+
+    const id = item.querySelector('id').textContent
+    const title = item.querySelector('title').textContent
+    const description = item.querySelector('summary').textContent
+    const tags = Array.from(item.querySelectorAll('category'))
+      .map(c => c.getAttribute('term'))
+      .filter(c => c && c !== 'article_news')
+      .map(c => '#' + c)
+      .join(' ')
+
+    const message = `> **${title}**\n> *${description} ${tags} #NouvelObs*`
+    articles.push({ id, message })
+  }
+
+  return articles
+}
+
 async function checkNewNews() {
   const articles = []
 
@@ -112,6 +149,13 @@ async function checkNewNews() {
     articles.push(...BFMTV)
   } catch (err) {
     console.warn('[BFMTV.error]', err)
+  }
+
+  try {
+    const NouvelObs = await fetchNouvelObs()
+    articles.push(...NouvelObs)
+  } catch (err) {
+    console.warn('[NouvelObs.error]', err)
   }
 
   for (const article of articles) {

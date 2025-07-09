@@ -161,6 +161,8 @@ async function checkNewNews() {
   for (const article of articles) {
     if (!newsAlreadyHandled.includes(article.id)) {
       await sendDiscordMessage(article.message)
+      await sleep(1000)
+      console.log('Send', article.id)
       newsAlreadyHandled.push(article.id)
     }
   }

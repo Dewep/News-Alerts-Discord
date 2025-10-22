@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   news-alerts-discord:
-    image: node:lts
+    image: node:22
     restart: always
     volumes:
       - .:/app

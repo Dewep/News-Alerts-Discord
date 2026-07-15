@@ -1,10 +1,17 @@
 # News-Alerts-Discord
 
-Send news live direct alerts to a Discord channel
+Send news live direct alerts to a Discord channel.
 
-- LeMonde https://www.lemonde.fr/actualite-en-continu/
-- BFM TV https://www.bfmtv.com/
-- FranceTV Info https://www.francetvinfo.fr/en-direct/
+Every 15 minutes, articles are collected from the sources below, then filtered by Claude Haiku
+(`claude-haiku-4-5`) to only keep the essential/important ones (few per day, less sport, more tech).
+Each published message ends with the importance score given by the filter (e.g. `(7/10)`).
+
+- Le Figaro Flash Actu (general news wire, mostly AFP dispatches) https://www.lefigaro.fr/rss/figaro_flash-actu.xml
+- LeMonde Pixels (tech) https://www.lemonde.fr/pixels/rss_full.xml
+
+Adding a source is a one-line entry in the `providers` list (any RSS 2.0 feed).
+Articles older than 12 hours are ignored, so a fresh start (no `handled-news.json`)
+or a long downtime does not flood the channel with the whole feed backlog.
 
 ![Discord Screenshot](./images/News-Alerts-Discord-screenshot.png)
 
@@ -15,13 +22,42 @@ Send news live direct alerts to a Discord channel
 - Add your bot to your Discord server: https://discord.com/oauth2/authorize?client_id=xxxx&scope=bot&permissions=2048 (xxxx is your app ID)
 - The Discord Channel ID is the second part of the URL: https://discord.com/channels/xxxx/yyyy (yyyy here)
 
+## Anthropic API key
+
+The news filtering uses the Anthropic API (Claude Haiku). Create an API key on
+https://platform.claude.com/ and put it in a `.env` file next to `docker-compose.yml`
+(this file is gitignored):
+
+```
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
 ## Usage
 
 For the first run, exec `zx --install main.mjs` to install dependencies.
 
 ```bash
-DISCORD_CHANNEL_ID=123456789 DISCORD_BOT_AUTHORIZATION=xxx.yyy.zzz zx main.mjs
+DISCORD_CHANNEL_ID=123456789 DISCORD_BOT_AUTHORIZATION=xxx.yyy.zzz ANTHROPIC_API_KEY=sk-ant-... zx main.mjs
 ```
+
+To test the collection + filtering without sending anything to Discord (and without
+persisting state):
+
+```bash
+ANTHROPIC_API_KEY=sk-ant-... zx main.mjs --dry-run
+```
+
+Handled article IDs are persisted in `handled-news.json` so a restart does not re-send
+already-processed news.
+
+## Tuning the filter
+
+Each article gets an importance score from 0 to 10; only articles scoring at or above the
+threshold are published. The default threshold is 6 (a handful of news per day). Set
+`NEWS_IMPORTANCE_THRESHOLD=7` for fewer news, `8` for major events only.
+
+The titles published over the last 48 hours are given back to the filter so the same event
+coming later from another source is not published twice.
 
 ## Docker
 

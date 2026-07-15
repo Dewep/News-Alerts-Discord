@@ -16,3 +16,11 @@
 
 # Node
 node_modules/
+package.json
+package-lock.json
+
+# Secrets
+.env
+
+# Runtime state
+handled-news.json

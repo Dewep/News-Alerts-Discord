@@ -10,4 +10,6 @@ services:
     environment:
       - DISCORD_CHANNEL_ID=123456789
       - DISCORD_BOT_AUTHORIZATION=xxx.yyy.zzz
+      # Read from the .env file next to this compose file (not committed)
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
     command: bash docker-command.sh

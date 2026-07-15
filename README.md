@@ -6,8 +6,11 @@ Every 15 minutes, articles are collected from the sources below, then filtered b
 (`claude-haiku-4-5`) to only keep the essential/important ones (few per day, less sport, more tech).
 Each published message ends with the importance score given by the filter (e.g. `(7/10)`).
 
-- Le Figaro Flash Actu (general news wire, mostly AFP dispatches) https://www.lefigaro.fr/rss/figaro_flash-actu.xml
+- FranceInfo (general news, curated headlines, heavily AFP-sourced) https://www.franceinfo.fr/titres.rss
 - LeMonde Pixels (tech) https://www.lemonde.fr/pixels/rss_full.xml
+
+Le Figaro Flash Actu would be a richer general wire but lefigaro.fr blocks datacenter IPs
+(Datadome bot challenge).
 
 Adding a source is a one-line entry in the `providers` list (any RSS 2.0 feed).
 Articles older than 12 hours are ignored, so a fresh start (no `handled-news.json`)

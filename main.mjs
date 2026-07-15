@@ -71,10 +71,24 @@ function stripHtml (text) {
 async function fetchRSS ({ source, url, maxItems = 30 }) {
   const articles = []
 
-  const response = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } })
+  const response = await fetch(url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0',
+      'Accept': 'application/rss+xml, application/xml;q=0.9, */*;q=0.8',
+    },
+  })
   const content = await response.text()
 
-  const dom = new JSDOM(content, { contentType: 'text/xml' })
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status} from ${url}: ${content.slice(0, 200).replace(/\s+/g, ' ')}`)
+  }
+
+  let dom
+  try {
+    dom = new JSDOM(content, { contentType: 'text/xml' })
+  } catch {
+    throw new Error(`Invalid XML from ${url} (HTTP ${response.status}), body starts with: ${content.slice(0, 200).replace(/\s+/g, ' ')}`)
+  }
   const items = dom.window.document.querySelectorAll('channel > item')
 
   for (const item of items) {
@@ -98,7 +112,10 @@ async function fetchRSS ({ source, url, maxItems = 30 }) {
 }
 
 const providers = [
-  { name: 'FigaroFlashActu', fetch: () => fetchRSS({ source: 'FigaroFlashActu', url: 'https://www.lefigaro.fr/rss/figaro_flash-actu.xml' }) },
+  // Le Figaro Flash Actu (https://www.lefigaro.fr/rss/figaro_flash-actu.xml) would be a
+  // richer general wire, but lefigaro.fr sits behind Datadome which serves a bot-challenge
+  // page to datacenter IPs instead of the feed
+  { name: 'FranceInfo', fetch: () => fetchRSS({ source: 'FranceInfo', url: 'https://www.franceinfo.fr/titres.rss' }) },
   { name: 'LeMondePixels', fetch: () => fetchRSS({ source: 'LeMondePixels', url: 'https://www.lemonde.fr/pixels/rss_full.xml' }) },
 ]
 

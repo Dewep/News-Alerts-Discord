@@ -3,7 +3,7 @@
 Send news live direct alerts to a Discord channel.
 
 Every 15 minutes, articles are collected from the sources below, then filtered by Claude Haiku
-(`claude-haiku-4-5`) to only keep the essential/important ones (few per day, less sport, more tech).
+(`claude-haiku-5-5`) to only keep the essential/important ones (few per day, less sport, more tech).
 Each published message ends with the importance score given by the filter (e.g. `(7/10)`).
 
 - FranceInfo (general news, curated headlines, heavily AFP-sourced) https://www.franceinfo.fr/titres.rss
@@ -61,6 +61,9 @@ threshold are published. The default threshold is 6 (a handful of news per day).
 
 The titles published over the last 48 hours are given back to the filter so the same event
 coming later from another source is not published twice.
+
+The filter model defaults to `claude-haiku-5-5` (10x cheaper than Haiku 4.5) and can be
+changed with `NEWS_FILTER_MODEL` (any Anthropic model ID, e.g. `claude-sonnet-5-5`).
 
 ## Docker
 

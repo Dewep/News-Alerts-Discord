@@ -123,7 +123,9 @@ const providers = [
 // fresh start (no state file) or after a long downtime
 const MAX_AGE_MS = 12 * 60 * 60 * 1000
 
-const FILTER_MODEL = 'claude-haiku-4-5'
+// Haiku 5.5: same editorial quality as Haiku 4.5 for this filter, ~10x cheaper.
+// Override with NEWS_FILTER_MODEL to try another Anthropic model.
+const FILTER_MODEL = $.env.NEWS_FILTER_MODEL || 'claude-haiku-5-5'
 const FILTER_THRESHOLD = Number($.env.NEWS_IMPORTANCE_THRESHOLD || 6)
 
 const FILTER_SYSTEM = `Tu es le filtre éditorial d'un canal Discord d'alertes d'actualité, suivi par des ingénieurs français (infrastructure, réseau, logiciel). Le canal couvre à la fois l'actualité générale importante (politique, économie, international) ET la tech : ne pénalise jamais une dépêche parce que son sujet n'est pas technique — une décision politique ou économique majeure mérite son score plein.

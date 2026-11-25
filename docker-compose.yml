@@ -6,6 +6,9 @@ services:
     restart: always
     volumes:
       - .:/app
+      # Keep each service's node_modules in its own volume so the two
+      # `zx --install` runs never write to the same directory at boot
+      - news-alerts-node-modules:/app/node_modules
     working_dir: /app
     environment:
       - DISCORD_CHANNEL_ID=123456789
@@ -13,3 +16,23 @@ services:
       # Read from the .env file next to this compose file (not committed)
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
     command: bash docker-command.sh
+
+  # Answers questions asked by mentioning the bot or replying to a news alert.
+  # Shares the bind mount (so it reads handled-news.json written above) but has
+  # its own node_modules volume.
+  news-alerts-bot:
+    image: node:22
+    restart: always
+    volumes:
+      - .:/app
+      - news-bot-node-modules:/app/node_modules
+    working_dir: /app
+    environment:
+      - DISCORD_CHANNEL_ID=123456789
+      - DISCORD_BOT_AUTHORIZATION=xxx.yyy.zzz
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    command: bash bot-command.sh
+
+volumes:
+  news-alerts-node-modules:
+  news-bot-node-modules:

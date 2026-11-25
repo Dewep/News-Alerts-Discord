@@ -45,7 +45,7 @@ function saveState () {
 }
 
 async function sendDiscordMessage (message) {
-  await fetch(`https://discordapp.com/api/channels/${discordChannelId}/messages`, {
+  const response = await fetch(`https://discordapp.com/api/channels/${discordChannelId}/messages`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -53,11 +53,23 @@ async function sendDiscordMessage (message) {
     },
     body: JSON.stringify({ content: message })
   })
+
+  if (!response.ok) {
+    console.warn(`[discord.error] ${response.status}: ${(await response.text()).slice(0, 200)}`)
+    return null
+  }
+
+  return response.json()
 }
 
 function buildMessage (article) {
   const parts = [article.description, '#' + article.source, `(${article.decision.importance}/10)`].filter(Boolean).join(' ')
-  return `> **${article.title}**\n> *${parts}*`
+  const lines = [`> **${article.title}**`, `> *${parts}*`]
+  if (article.link) {
+    // <url> form: keeps the URL clickable without spawning an embed
+    lines.push(`> <${article.link}>`)
+  }
+  return lines.join('\n')
 }
 
 function stripHtml (text) {
@@ -96,7 +108,8 @@ async function fetchRSS ({ source, url, maxItems = 30 }) {
       break
     }
 
-    const id = item.querySelector('guid')?.textContent || item.querySelector('link')?.textContent
+    const link = item.querySelector('link')?.textContent
+    const id = item.querySelector('guid')?.textContent || link
     const title = stripHtml(item.querySelector('title')?.textContent)
     const description = stripHtml(item.querySelector('description')?.textContent)
     const pubDate = Date.parse(item.querySelector('pubDate')?.textContent || '')
@@ -105,7 +118,7 @@ async function fetchRSS ({ source, url, maxItems = 30 }) {
       continue
     }
 
-    articles.push({ id, source, title, description, date: Number.isNaN(pubDate) ? null : pubDate })
+    articles.push({ id, link, source, title, description, date: Number.isNaN(pubDate) ? null : pubDate })
   }
 
   return articles
@@ -238,15 +251,25 @@ async function checkNewNews () {
   }
 
   for (const article of evaluated) {
+    let sent = null
     if (article.decision.keep) {
       if (dryRun) {
         console.log(`[KEEP ${article.decision.importance}] ${buildMessage(article)}\n       → ${article.decision.reason}`)
       } else {
-        await sendDiscordMessage(buildMessage(article))
+        sent = await sendDiscordMessage(buildMessage(article))
         await sleep(1000)
         console.log('Send', article.id)
       }
-      state.published.push({ title: article.title, source: article.source, at: new Date().toISOString() })
+      // Keep the article context (link, description) and the Discord message id so
+      // the Q&A bot (bot.mjs) can resolve a reply back to the news it is about
+      state.published.push({
+        title: article.title,
+        source: article.source,
+        at: new Date().toISOString(),
+        link: article.link,
+        description: article.description,
+        discordMessageId: sent?.id,
+      })
     } else if (dryRun) {
       console.log(`[skip ${article.decision.importance}] (${article.source}) ${article.title}\n       → ${article.decision.reason}`)
     }

@@ -16,6 +16,9 @@ Adding a source is a one-line entry in the `providers` list (any RSS 2.0 feed).
 Articles older than 12 hours are ignored, so a fresh start (no `handled-news.json`)
 or a long downtime does not flood the channel with the whole feed backlog.
 
+You can also **ask follow-up questions** about a published news item by mentioning the
+bot in the channel — see [Asking questions](#asking-questions-about-a-news-item).
+
 ![Discord Screenshot](./images/News-Alerts-Discord-screenshot.png)
 
 ## Discord BOT
@@ -65,7 +68,47 @@ coming later from another source is not published twice.
 The filter model defaults to `claude-haiku-5-5` (10x cheaper than Haiku 4.5) and can be
 changed with `NEWS_FILTER_MODEL` (any Anthropic model ID, e.g. `claude-sonnet-5-5`).
 
+## Asking questions about a news item
+
+A second service (`bot.mjs`) connects to the Discord **gateway** — an outbound
+WebSocket, so there is nothing to expose and no inbound port to listen on. It answers
+questions about a published news item when the bot is **mentioned**, e.g.
+`@NewsBot where does this number come from?`
+
+The bot only reacts to a mention: simply replying to one of its messages does **not**
+trigger an answer, so members can debate the news among themselves. To give the question
+its news context, mention the bot *in a reply* to the alert (or to a previous answer) —
+the article (title, summary, link) is then read from `handled-news.json`. The answer is
+written by Claude using Anthropic's server-side `web_search` and `web_fetch` tools, so it
+can look things up and cite sources.
+
+Setup:
+
+- Enable the **Message Content** privileged intent for your bot
+  (Discord Developer Portal → your app → Bot → Privileged Gateway Intents). Without it,
+  Discord still delivers the content of mentions and replies to the bot, but enabling it
+  is recommended.
+- No extra Discord permission is required (the bot already needs *Send Messages*).
+- Run the `news-alerts-bot` service (see [Docker](#docker)), or locally:
+
+  ```bash
+  DISCORD_CHANNEL_ID=123456789 DISCORD_BOT_AUTHORIZATION=xxx.yyy.zzz ANTHROPIC_API_KEY=sk-ant-... zx bot.mjs
+  ```
+
+Notes:
+
+- Answers are capped at ~1900 characters and split over several messages if longer.
+- The news context is only kept 48h (same retention as `handled-news.json`); after that
+  the bot falls back to the raw quoted message.
+- `NEWS_ANSWER_MODEL` selects the answering model (default `claude-haiku-5-5`); a Sonnet
+  model answers better at a higher cost.
+- Already-answered question IDs are persisted in `answered-questions.json` so a restart
+  does not answer them twice.
+
 ## Docker
+
+This starts two services: the news poller and the Q&A bot. Each gets its own
+`node_modules` volume so the two `zx --install` runs at boot never clash.
 
 ```
 git pull

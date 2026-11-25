@@ -28,15 +28,20 @@ bot in the channel — see [Asking questions](#asking-questions-about-a-news-ite
 - Add your bot to your Discord server: https://discord.com/oauth2/authorize?client_id=xxxx&scope=bot&permissions=2048 (xxxx is your app ID)
 - The Discord Channel ID is the second part of the URL: https://discord.com/channels/xxxx/yyyy (yyyy here)
 
-## Anthropic API key
+## Configuration
 
-The news filtering uses the Anthropic API (Claude Haiku). Create an API key on
-https://platform.claude.com/ and put it in a `.env` file next to `docker-compose.yml`
-(this file is gitignored):
+Secrets and settings are read from a `.env` file next to `docker-compose.yml`
+(this file is gitignored). Create it with:
 
 ```
+DISCORD_CHANNEL_ID=123456789
+DISCORD_BOT_AUTHORIZATION=xxx.yyy.zzz
 ANTHROPIC_API_KEY=sk-ant-...
 ```
+
+- `DISCORD_CHANNEL_ID` / `DISCORD_BOT_AUTHORIZATION`: see the Discord BOT section above.
+- `ANTHROPIC_API_KEY`: from https://platform.claude.com/ — used for the news filtering
+  (Claude Haiku) and for the Q&A bot.
 
 ## Usage
 

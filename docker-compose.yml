@@ -11,9 +11,9 @@ services:
       - news-alerts-node-modules:/app/node_modules
     working_dir: /app
     environment:
-      - DISCORD_CHANNEL_ID=123456789
-      - DISCORD_BOT_AUTHORIZATION=xxx.yyy.zzz
-      # Read from the .env file next to this compose file (not committed)
+      # All settings come from the .env file next to this compose file (not committed)
+      - DISCORD_CHANNEL_ID=${DISCORD_CHANNEL_ID}
+      - DISCORD_BOT_AUTHORIZATION=${DISCORD_BOT_AUTHORIZATION}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
     command: bash docker-command.sh
 
@@ -28,8 +28,8 @@ services:
       - news-bot-node-modules:/app/node_modules
     working_dir: /app
     environment:
-      - DISCORD_CHANNEL_ID=123456789
-      - DISCORD_BOT_AUTHORIZATION=xxx.yyy.zzz
+      - DISCORD_CHANNEL_ID=${DISCORD_CHANNEL_ID}
+      - DISCORD_BOT_AUTHORIZATION=${DISCORD_BOT_AUTHORIZATION}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
     command: bash bot-command.sh
 

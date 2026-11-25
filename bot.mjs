@@ -63,12 +63,12 @@ const ANSWER_SYSTEM = `Tu es l'assistant du canal Discord d'alertes d'actualité
 Tu reçois, quand il est disponible, le contexte de l'actualité concernée (titre, résumé, source, lien), puis la question.
 
 Règles de réponse :
-- Réponds toujours en français.
-- Sois court et va droit au but : quelques phrases suffisent. Ne développe en détail que si on te le demande explicitement.
-- Tu peux et dois utiliser la recherche web (web_search) et la lecture de pages (web_fetch) pour vérifier les faits et compléter le contexte fourni. Cite tes sources sous forme de liens Markdown quand tu t'appuies sur le web.
-- N'invente jamais. Si tu ne trouves pas la réponse, dis-le simplement (« je ne trouve pas », « je ne sais pas ») plutôt que de hasarder une réponse fausse.
-- Si une information est incertaine, approximative, ou provient d'une source unique ou peu fiable, signale-le explicitement (« d'après X », « à confirmer », « source unique »).
-- Pas de formule de politesse ni de rappel de la question en début de réponse.`
+- Réponds toujours en français, en texte courant.
+- Sois bref : une à trois phrases par question posée, pas plus. Va droit au but.
+- Pas de titres, pas de sections en gras, pas de rappel de la question, pas de formule de politesse. N'ajoute rien qui n'ait pas été demandé (pas de « pour préciser », pas de contexte supplémentaire en fin de message).
+- Tu peux et dois utiliser la recherche web (web_search) et la lecture de pages (web_fetch) pour vérifier les faits et compléter le contexte fourni. Cite tes sources par un lien Markdown directement dans le texte.
+- N'invente jamais. Si tu ne trouves pas la réponse, dis-le en une phrase (« je ne trouve pas », « je ne sais pas ») plutôt que de hasarder une réponse fausse.
+- Si une information est incertaine ou provient d'une source unique, signale-le en quelques mots (« d'après X », « à confirmer »), sans longue mise en garde.`
 
 function buildContext (article, referencedContent) {
   if (article) {
@@ -114,8 +114,8 @@ async function askClaude (context, question, history) {
       // If the API ever rejects web_fetch with a 400 about a beta header, pass
       // `anthropic-beta: web-fetch-2025-09-10` (headers option) or drop the tool.
       tools: [
-        { type: 'web_search_20250305', name: 'web_search', max_uses: 5 },
-        { type: 'web_fetch_20250910', name: 'web_fetch', max_uses: 5 },
+        { type: 'web_search_20250305', name: 'web_search', max_uses: 3 },
+        { type: 'web_fetch_20250910', name: 'web_fetch', max_uses: 3 },
       ],
       messages,
     })
@@ -128,7 +128,10 @@ async function askClaude (context, question, history) {
     const text = response.content
       .filter(block => block.type === 'text')
       .map(block => block.text)
-      .join('\n')
+      // Concatenate without a separator: the API splits the assistant text into
+      // several blocks around citation anchors, and joining with '\n' would inject
+      // spurious line breaks in the middle of sentences.
+      .join('')
       .trim()
 
     return { text, prompt: content }
